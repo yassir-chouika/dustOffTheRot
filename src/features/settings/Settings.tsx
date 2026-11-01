@@ -5,9 +5,11 @@ import { ThemePicker } from './ThemePicker';
 import { themes } from './themes';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
+import { useAuth } from '../auth/state';
 
 export function Settings() {
   const { preferences, updatePreferences, storageError } = useApp();
+  const { demo } = useAuth();
   const [helpOpen, setHelpOpen] = useState(false);
   const selected = themes.find((theme) => theme.id === preferences.theme)!;
 
@@ -21,7 +23,11 @@ export function Settings() {
         </div>
         <span className="local-badge">
           <Check size={14} aria-hidden="true" />
-          {storageError ? 'For this visit only' : 'Saved on this device'}
+          {demo
+            ? storageError
+              ? 'For this visit only'
+              : 'Saved on this device'
+            : 'Private reading room'}
         </span>
       </header>
       <div className="settings-grid">
@@ -55,10 +61,63 @@ export function Settings() {
                 restful green. Classic keeps the page bright and simple.
               </p>
               <p>
-                Your choice is saved in this browser. Original PDF page colors may stay as they are;
-                this preview shows Folio’s interface and reading surfaces.
+                Your choice is saved for your reading room. Original PDF page colors may stay as
+                they are; this preview shows Folio’s interface and reading surfaces.
               </p>
             </Dialog>
+          </section>
+          <section className="settings-panel" aria-labelledby="type-title">
+            <div className="section-heading">
+              <h2 id="type-title">Type, space, and breathing room</h2>
+            </div>
+            <div className="reader-settings-fields">
+              <label>
+                Reading font
+                <select
+                  value={preferences.font}
+                  onChange={(e) => updatePreferences({ font: e.target.value as 'serif' | 'sans' })}
+                >
+                  <option value="serif">Literary serif</option>
+                  <option value="sans">Clear sans serif</option>
+                </select>
+              </label>
+              <label>
+                Font size · {preferences.fontSize}px
+                <input
+                  type="range"
+                  min={14}
+                  max={32}
+                  value={preferences.fontSize}
+                  onChange={(e) => updatePreferences({ fontSize: Number(e.target.value) })}
+                />
+              </label>
+              <label>
+                Line spacing · {preferences.lineHeight}
+                <input
+                  type="range"
+                  min={1.3}
+                  max={2.2}
+                  step={0.1}
+                  value={preferences.lineHeight}
+                  onChange={(e) => updatePreferences({ lineHeight: Number(e.target.value) })}
+                />
+              </label>
+              <label>
+                Page width · {preferences.pageWidth}px
+                <input
+                  type="range"
+                  min={320}
+                  max={1200}
+                  step={20}
+                  value={preferences.pageWidth}
+                  onChange={(e) => updatePreferences({ pageWidth: Number(e.target.value) })}
+                />
+              </label>
+              <p className="muted">
+                Typography changes apply to EPUB text. PDFs keep their original fonts and offer page
+                zoom instead.
+              </p>
+            </div>
           </section>
           <section className="settings-panel" aria-labelledby="motion-title">
             <div className="section-heading">
@@ -85,7 +144,9 @@ export function Settings() {
           </section>
           <p className="device-note">
             <Leaf size={17} aria-hidden="true" />
-            Your preferences stay in this browser. Make yourself at home.
+            {demo
+              ? 'Your preferences stay in this browser. Make yourself at home.'
+              : 'Your preferences follow your account. Make yourself at home.'}
           </p>
         </div>
         <section className="reading-preview" aria-labelledby="preview-title">
@@ -103,11 +164,25 @@ export function Settings() {
               <br />
               the pages.
             </h2>
-            <p className="preview-prose">
+            <p
+              className="preview-prose"
+              style={{
+                fontFamily: preferences.font === 'serif' ? 'Georgia, serif' : 'Arial, sans-serif',
+                fontSize: preferences.fontSize,
+                lineHeight: preferences.lineHeight,
+              }}
+            >
               The afternoon light moved slowly across the room. She set a cup beside the window,
               opened her book, and let the world grow a little smaller.
             </p>
-            <p className="preview-prose">
+            <p
+              className="preview-prose"
+              style={{
+                fontFamily: preferences.font === 'serif' ? 'Georgia, serif' : 'Arial, sans-serif',
+                fontSize: preferences.fontSize,
+                lineHeight: preferences.lineHeight,
+              }}
+            >
               There was nowhere else to be. Just this chair, this page, and a story waiting
               patiently to begin.
             </p>

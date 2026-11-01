@@ -15,6 +15,9 @@ export interface Book {
   coverLabel: string;
   year: number;
   length: string;
+  storagePath?: string;
+  coverPath?: string;
+  language?: string;
 }
 
 export interface PersonalBook {
@@ -30,6 +33,25 @@ export interface Preferences {
   fontSize: number;
   lineHeight: number;
   reducedMotion: boolean;
+  pageWidth: number;
+  margin: number;
+  layout: 'paginated' | 'scroll' | 'spread';
+  ttsRate: number;
+}
+
+export type Locator =
+  { type: 'pdf'; page: number; zoom?: number; offset?: number } | { type: 'epub'; cfi: string };
+export interface ReadingPosition {
+  locator: Locator;
+  percentage: number;
+  lastReadAt: string;
+}
+export interface BookmarkRecord {
+  id: string;
+  bookId: string;
+  locator: Locator;
+  label: string;
+  createdAt: string;
 }
 
 export interface LibraryQuery {

@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { BookOpen, Heart } from 'lucide-react';
+import { useAuth } from '../auth/state';
 import { useApp } from '../../app/state';
 import { defaultPersonalBook } from '../library/catalog';
 import { Cover } from './Cover';
@@ -10,6 +11,7 @@ import type { ReadingStatus } from '../../types';
 
 export function BookDetails() {
   const { id } = useParams();
+  const { demo } = useAuth();
   const { books, personal, updateBook, loading, error, retry } = useApp();
   const book = books.find((item) => item.id === id);
   if (loading) return <LoadingState label="Loading book…" />;
@@ -92,7 +94,9 @@ export function BookDetails() {
               <option value="finished">Finished</option>
             </select>
           </label>
-          <p className="notice">Fictional preview metadata. No book file is attached.</p>
+          {demo && (
+            <p className="notice">Original sample text is included in this fictional preview.</p>
+          )}
         </div>
       </div>
     </>

@@ -1,63 +1,21 @@
-import { Link, Route, Routes, useParams } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { Link, Route, Routes } from 'react-router-dom';
 import { AppProvider } from './Provider';
-import { useApp } from './state';
 import { Layout } from '../components/Layout';
 import { EmptyState } from '../components/EmptyState';
 import { Library } from '../features/library/Library';
 import { BookDetails } from '../features/books/BookDetails';
 import { Settings } from '../features/settings/Settings';
-import { LoadingState, ErrorState } from '../components/Feedback';
+import { LoadingState } from '../components/Feedback';
+import { AuthProvider } from '../features/auth/AuthProvider';
+import { AuthGate } from '../features/auth/AuthGate';
+import { useAuth } from '../features/auth/state';
 
-function BookPlaceholder({ reader = false }: { reader?: boolean }) {
-  const { id } = useParams();
-  const { books, loading, error, retry } = useApp();
-  const book = books.find((entry) => entry.id === id);
-  if (loading) return <LoadingState label="Loading book…" />;
-  if (error) return <ErrorState title="Could not load this book" message={error} onRetry={retry} />;
-  if (!book) return <NotFound />;
-  return (
-    <>
-      <Link className="back-link" to="/">
-        ← Back to library
-      </Link>
-      <header className="page-header">
-        <p className="eyebrow">{reader ? 'READER PREVIEW' : 'BOOK DETAILS PREVIEW'}</p>
-        <h1>{book.title}</h1>
-        <p className="muted">
-          {book.author} · {book.format}
-        </p>
-      </header>
-      <EmptyState title={reader ? 'Your reading room is on its way' : 'A place for every book'}>
-        <p>
-          {reader
-            ? 'Book reading is coming soon. This fictional book has no attached file.'
-            : 'Book details are coming soon. This is fictional preview metadata.'}
-        </p>
-        {!reader && (
-          <Link className="button" to={`/read/${book.id}`}>
-            View reader placeholder
-          </Link>
-        )}
-      </EmptyState>
-    </>
-  );
-}
-
-function AdminPlaceholder() {
-  return (
-    <EmptyState title="A thoughtful library starts here">
-      <p>
-        Admin sign-in and importing are coming soon. This preview does not accept uploads or grant
-        admin access.
-      </p>
-      <Link className="button" to="/">
-        Return to library
-      </Link>
-    </EmptyState>
-  );
-}
+const Reader = lazy(() => import('../features/reader/Reader'));
+const Admin = lazy(() => import('../features/admin/Admin'));
 
 function About() {
+  const { demo } = useAuth();
   return (
     <>
       <header className="page-header">
@@ -66,12 +24,36 @@ function About() {
       </header>
       <div className="settings-panel">
         <p>
-          Folio is a personal, invite-only reading app in development. This foundation preview uses
-          fictional book metadata and browser-local preferences.
+          Folio is a personal reading room for PDFs and EPUBs. Open a book, find a comfortable
+          atmosphere, and return to your saved place whenever you’re ready.
         </p>
         <p>
-          Authentication, cloud storage, document reading, and read-aloud are not connected yet. No
-          real books or private reading activity are included.
+          {demo
+            ? 'This preview uses fictional metadata and original sample text. Shelves, settings, bookmarks, and reading positions stay in this browser.'
+            : 'Your library is invite-only. The owner manages books; your reading progress, shelves, bookmarks, and preferences belong to your account.'}
+        </p>
+        <p>
+          PDFs keep their original fonts and page colors. EPUB text can reflow to suit your screen.
+          Scanned PDFs need OCR for text selection and read-aloud; OCR is not included.
+        </p>
+        <p>
+          Read-aloud uses your browser’s available voices. Voice quality, word highlighting, and
+          offline availability vary by device. Speech stops when you leave the reader.
+        </p>
+        <p>
+          Book files are private. Signed access links are temporary access, not DRM. Only import and
+          share material you have permission to use.
+        </p>
+        <p>
+          Made with open-source software.{' '}
+          <a
+            className="text-link"
+            href="/third-party-notices.txt"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View third-party notices ↗
+          </a>
         </p>
         <Link className="button" to="/">
           Back to your reading room
@@ -92,20 +74,45 @@ function NotFound() {
   );
 }
 
-export function App() {
+function ReadingRoom() {
+  const { user, demo } = useAuth();
   return (
-    <AppProvider>
+    <AppProvider key={demo ? 'demo' : user?.id}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Library />} />
           <Route path="books/:id" element={<BookDetails />} />
-          <Route path="read/:id" element={<BookPlaceholder reader />} />
+          <Route
+            path="read/:id"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <Reader />
+              </Suspense>
+            }
+          />
           <Route path="settings" element={<Settings />} />
-          <Route path="admin" element={<AdminPlaceholder />} />
+          <Route
+            path="admin"
+            element={
+              <Suspense fallback={<LoadingState />}>
+                <Admin />
+              </Suspense>
+            }
+          />
           <Route path="about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </AppProvider>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AuthGate>
+        <ReadingRoom />
+      </AuthGate>
+    </AuthProvider>
   );
 }

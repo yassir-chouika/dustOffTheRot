@@ -11,6 +11,10 @@ export interface AppState {
   preferences: Preferences;
   updatePreferences: (patch: Partial<Preferences>) => void;
   storageError: boolean;
+  syncError: string | null;
+  reportSyncError: (message: string) => void;
+  flushChanges: () => Promise<void>;
+  registerReadingSaver: (save: () => Promise<void>) => () => void;
 }
 
 export const AppContext = createContext<AppState | null>(null);

@@ -8,6 +8,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { ErrorState, LoadingState } from '../../components/Feedback';
 import { Button } from '../../components/ui/Button';
 import type { Book, LibraryQuery, Shelf } from '../../types';
+import { useAuth } from '../auth/state';
 
 const shelves: { id: Shelf; label: string }[] = [
   { id: 'all', label: 'All books' },
@@ -65,6 +66,7 @@ function BookCard({ book }: { book: Book }) {
 }
 
 export function Library() {
+  const { demo } = useAuth();
   const { books, personal, loading, error, retry } = useApp();
   const [params, setParams] = useSearchParams();
   const latestParams = useRef(params);
@@ -251,7 +253,9 @@ export function Library() {
           </section>
         </>
       )}
-      <p className="notice">Preview collection · fictional books and browser-local shelves.</p>
+      {demo && (
+        <p className="notice">Preview collection · fictional books and browser-local shelves.</p>
+      )}
     </>
   );
 }

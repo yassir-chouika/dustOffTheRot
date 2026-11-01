@@ -1,10 +1,12 @@
 node_modules/
 dist/
 .env*
+.emv*
 !.env.example
 uploads/
 playwright-report/
 test-results/
+test-results-cloud/
 *.tsbuildinfo
 .DS_Store
 coverage/
@@ -12,3 +14,6 @@ coverage/
 # Private project planning documents (keep local only).
 /README.md
 /ROADMAP.md
+/supabase/.temp/
+/public/pdfjs/
+/public/third-party-notices.txt
