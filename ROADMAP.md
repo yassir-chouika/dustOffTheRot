@@ -2,7 +2,7 @@
 
 > A build plan for one developer. Complete one milestone at a time. **Every milestone ends with a verified push**, and ideally a merged pull request. Avoid arbitrary daily commit quotas—commit when a coherent piece of work is finished.
 
-**Starting status:** All milestones unchecked.  
+**Current status:** M01 foundation implemented and validated; M02 is next. Service access verified; backend integration begins at M04.  
 **Target v1:** Invite-only library, admin PDF/EPUB imports, usable readers, progress + shelves, comfortable themes/accessibility, read-aloud, testing, and a deployable demo.  
 **Working stack:** React + Vite + TypeScript + Tailwind + shadcn/ui + Motion; PDF.js and EPUB.js; Supabase Postgres/Auth/Storage; optional StPageFlip; Web Speech API; Vitest, Testing Library, Playwright, GitHub Actions; Vercel.
 
@@ -128,13 +128,13 @@ Tasks:
 **Goal:** Running development app with consistent scripts and a basic test.
 
 Tasks:
-- [ ] Scaffold Vite React TypeScript without nesting another unwanted Git repository.
-- [ ] Add Tailwind CSS and minimal app styles.
-- [ ] Configure ESLint, Prettier, strict TypeScript, import/path conventions, and `.gitignore`.
-- [ ] Add React Router placeholder routes: `/`, `/books/:id`, `/read/:id`, `/settings`, `/admin`.
-- [ ] Add Vitest + React Testing Library with one passing app-shell smoke test.
-- [ ] Provide scripts such as `dev`, `build`, `preview`, `typecheck`, `lint`, `test`.
-- [ ] Add `.env.example`; exclude `.env.local`, `dist`, `node_modules`, and upload folders.
+- [x] Scaffold Vite React TypeScript without nesting another unwanted Git repository.
+- [x] Add Tailwind CSS and minimal app styles.
+- [x] Configure ESLint, Prettier, strict TypeScript, import/path conventions, and `.gitignore`.
+- [x] Add React Router placeholder routes: `/`, `/books/:id`, `/read/:id`, `/settings`, `/admin`.
+- [x] Add Vitest + React Testing Library with one passing app-shell smoke test.
+- [x] Provide scripts such as `dev`, `build`, `preview`, `typecheck`, `lint`, `test`.
+- [x] Add `.env.example`; exclude `.env.local`, `dist`, `node_modules`, and upload folders.
 
 **Acceptance:** App launches; typecheck/lint/test/build succeed; no secret or real e-book in Git.
 
@@ -493,3 +493,9 @@ You **do not** need a new commit every time you change a CSS class. But do not b
 **13 mandatory pushes/checkpoints from M00 through M12** (one at the end of each milestone). These are *checkpoints*, not a claim that you'll make exactly 13 Git pushes total. You can safely push a working branch more often when it helps. The goal is a clear, professional Git history, not an arbitrary commit count.
 
 **Start now:** M00 docs push → M01 scaffold → M02 visual foundation → M03 library UI. Having the first three working UI milestones will make the project feel real before tackling the document engines and backend.
+
+## Verified foundation checkpoint — November 1, 2026
+
+The existing partial scaffold was preserved and completed with the entry point, app routes, base styles, atmosphere controls, fallback screens, and tests. Typecheck, lint, six component smoke tests, production build, formatting, and desktop/mobile Chromium smoke checks pass on Node 24 LTS. Library and reader routes remain placeholders. No book binaries, credentials, or uploaded files are included.
+
+Supabase plugin access to `sxdhsvmszqbsybblfntv` is healthy; the public schema is empty. GitHub access to `yassir-chouika/dustOffTheRot` is verified. M00 documentation was saved to the initially empty repository before the M01 branch. Sample-distribution rights and the app source license remain owner decisions before release. No account setup action is required for M01.

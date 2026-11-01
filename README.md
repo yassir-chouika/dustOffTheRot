@@ -1,6 +1,6 @@
 # Folio — A Beautiful, Distraction-Free Reading App
 
-> **Status:** Planning / not yet implemented  
+> **Status:** M01 foundation implemented; M02 design system is next  
 > **Working name:** Folio (rename anytime)  
 > **Goal:** A personal-first, optionally invite-only web app that makes reading PDFs and EPUBs comfortable, immersive, and enjoyable—with accessible controls, gentle animations, and free read-aloud playback.
 
@@ -260,38 +260,45 @@ Keep components near the feature that owns them. Avoid giant components that com
 
 **Non-goals:** Social feeds, leaderboards, forced streaks, paywalled libraries, paid APIs, and guaranteed conversion of every PDF into perfect responsive text.
 
-## 10. Local setup (instructions for once milestone M01 is implemented)
+## 10. Local setup
 
-The project is **not scaffolded yet**. These are intended setup commands, not a claim that a working codebase exists.
+Use **Node 24 LTS** (see `.nvmrc`; Node 22.12+ LTS is also supported). Node 26 is not supported by the current test environment.
 
 ```bash
-# Run from the PARENT directory of your existing folio Git repository.
-# Generate the Vite starter in a temporary sibling folder so your
-# existing README.md, ROADMAP.md, and .git directory are untouched.
-npm create vite@latest folio-starter -- --template react-ts
-cd folio-starter
-npm install
+nvm use
+npm ci
 npm run dev
 ```
 
-Then copy the generated application files/configuration into your existing `folio` Git repository **without overwriting** `README.md`, `ROADMAP.md`, or `.git`. Install dependencies again from inside the actual `folio` repository and remove the temporary starter folder once everything works. If starting with no repository at all, you can instead scaffold directly into a new project folder before the first commit.
-
-Packages should be added **in the milestone that uses them** rather than blindly installing everything upfront. For example:
+Vite serves the app at `http://127.0.0.1:5173`. The foundation includes a responsive navigation shell and routes for `/`, `/books/:id`, `/read/:id`, `/settings`, `/admin`, and `/about`, plus a not-found fallback. Four atmosphere previews and the reduced-motion preference persist in this browser. Library, book detail, reader, and admin screens are explicitly marked development placeholders. The seeded catalog is fictional metadata, with no attached book files.
 
 ```bash
-npm install motion
-# Later: PDF.js, EPUB.js, Supabase client, and testing tools as needed.
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npm run format:check
+# Browser setup, once:
+npx playwright install chromium
+npm run test:e2e
 ```
 
-Expected environment variable names once Supabase is wired:
+The browser smoke tests run desktop Chromium and a mobile viewport. They verify navigation, local preference persistence after reload, no horizontal overflow, and no uncaught page errors. A mobile viewport is not a substitute for testing on a real phone. The existing `vercel.json` supplies SPA rewrites; no deployment is configured or published yet.
+
+### Connected services
+
+On November 1, 2026, the Supabase plugin verified access to project `sxdhsvmszqbsybblfntv` (Folio, `ACTIVE_HEALTHY`). Its `public` schema had no application tables. The GitHub plugin verified access to `yassir-chouika/dustOffTheRot`.
+
+No Supabase credentials are required to run this foundation. Authentication, schema/RLS, storage, and the Supabase client are **not wired yet**; they are planned for M04 after the mock library milestones. Existing `.env.local` contents are preserved and ignored. Never commit secrets or use a service-role/secret key in a `VITE_` variable.
+
+Planned public client configuration (`.env.example` contains placeholders):
 
 ```dotenv
-# .env.example (safe placeholders; never commit real secrets)
 VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 VITE_SUPABASE_ANON_KEY=YOUR_PUBLIC_PUBLISHABLE_OR_ANON_KEY
 ```
 
-The publicly exposed key is only safe **with correct RLS policies**. Keep `.env.local` excluded from Git. **Never expose a Supabase service-role/secret key in a Vite frontend.**
+Public client keys require appropriate RLS and storage policies before backend access is enabled. Install additional packages only in milestones that use them; the starting scaffold already included some future reader/backend dependencies.
 
 ## 11. Quality and definition of done
 
