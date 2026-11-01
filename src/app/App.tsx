@@ -3,34 +3,10 @@ import { AppProvider } from './Provider';
 import { useApp } from './state';
 import { Layout } from '../components/Layout';
 import { EmptyState } from '../components/EmptyState';
+import { Library } from '../features/library/Library';
+import { BookDetails } from '../features/books/BookDetails';
 import { Settings } from '../features/settings/Settings';
 import { LoadingState, ErrorState } from '../components/Feedback';
-
-function LibraryPlaceholder() {
-  return (
-    <>
-      <header className="page-header">
-        <p className="eyebrow">YOUR OWN LITTLE CORNER</p>
-        <h1>A little room for reading.</h1>
-        <p className="muted">Settle in. Your next chapter can wait until you’re ready.</p>
-      </header>
-      <section className="welcome-panel" aria-labelledby="welcome-title">
-        <p className="eyebrow">THE FIRST CHAPTER</p>
-        <h2 id="welcome-title">Good things begin with a little space.</h2>
-        <p>
-          A quiet place for the stories you’ll return to. Start by choosing the atmosphere that
-          feels like home.
-        </p>
-        <Link className="button button-primary" to="/settings">
-          Find your reading atmosphere
-        </Link>
-      </section>
-      <p className="notice">
-        Development preview · fictional catalog metadata only. No books are available to read yet.
-      </p>
-    </>
-  );
-}
 
 function BookPlaceholder({ reader = false }: { reader?: boolean }) {
   const { id } = useParams();
@@ -121,8 +97,8 @@ export function App() {
     <AppProvider>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<LibraryPlaceholder />} />
-          <Route path="books/:id" element={<BookPlaceholder />} />
+          <Route index element={<Library />} />
+          <Route path="books/:id" element={<BookDetails />} />
           <Route path="read/:id" element={<BookPlaceholder reader />} />
           <Route path="settings" element={<Settings />} />
           <Route path="admin" element={<AdminPlaceholder />} />

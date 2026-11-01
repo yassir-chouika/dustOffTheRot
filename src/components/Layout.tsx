@@ -29,13 +29,17 @@ export function Layout() {
   const location = useLocation();
   const { books, personal, storageError } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const previousLocation = useRef(location.key);
+  const previousLocation = useRef(location.pathname);
   useEffect(() => {
-    if (previousLocation.current !== location.key) {
+    if (previousLocation.current !== location.pathname) {
       document.getElementById('main-content')?.focus();
-      previousLocation.current = location.key;
+      previousLocation.current = location.pathname;
     }
-  }, [location.key]);
+  }, [location.pathname]);
+  const closeNavigation = () => {
+    setMobileOpen(false);
+    if (mobileOpen) requestAnimationFrame(() => document.getElementById('main-content')?.focus());
+  };
   const currentShelf = new URLSearchParams(location.search).get('shelf') ?? 'all';
   const countFor = (shelf: string) =>
     books.filter((book) => {
@@ -91,7 +95,7 @@ export function Layout() {
               aria-current={
                 location.pathname === '/' && currentShelf === shelf ? 'page' : undefined
               }
-              onClick={() => setMobileOpen(false)}
+              onClick={closeNavigation}
             >
               <Icon size={18} strokeWidth={1.6} />
               <span>{label}</span>
@@ -101,11 +105,11 @@ export function Layout() {
         </nav>
         <div className="sidebar-divider" />
         <nav aria-label="App settings">
-          <NavLink className="nav-item" to="/settings" onClick={() => setMobileOpen(false)}>
+          <NavLink className="nav-item" to="/settings" onClick={closeNavigation}>
             <Settings2 size={18} strokeWidth={1.6} />
             <span>Reading preferences</span>
           </NavLink>
-          <NavLink className="nav-item" to="/admin" onClick={() => setMobileOpen(false)}>
+          <NavLink className="nav-item" to="/admin" onClick={closeNavigation}>
             <Plus size={18} strokeWidth={1.6} />
             <span>Manage library</span>
             <ArrowUpRight size={14} />
@@ -124,7 +128,7 @@ export function Layout() {
             <span>Aa</span>
           </div>
           <ThemePicker compact />
-          <Link to="/about" className="profile-row" onClick={() => setMobileOpen(false)}>
+          <Link to="/about" className="profile-row" onClick={closeNavigation}>
             <span className="avatar">F</span>
             <span>
               <strong>Your reading room</strong>
