@@ -16,6 +16,8 @@ import {
 import { ThemePicker } from '../features/settings/ThemePicker';
 import { useApp } from '../app/state';
 import { Button } from './ui/Button';
+import { useAuth } from '../features/auth/state';
+import { supabase } from '../lib/supabase';
 
 const shelves = [
   { label: 'All books', to: '/', icon: Library, shelf: 'all' },
@@ -27,8 +29,25 @@ const shelves = [
 
 export function Layout() {
   const location = useLocation();
-  const { books, personal, storageError } = useApp();
+  const { books, personal, storageError, syncError, retry, flushChanges, reportSyncError } =
+    useApp();
+  const { demo, profile } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const signOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await flushChanges();
+      const result = await supabase?.auth.signOut({ scope: 'local' });
+      if (result?.error)
+        reportSyncError('Sign-out could not be completed. Check your connection and try again.');
+    } catch {
+      reportSyncError('Sign-out could not be completed. Check your connection and try again.');
+    } finally {
+      setSigningOut(false);
+    }
+  };
   const previousLocation = useRef(location.pathname);
   useEffect(() => {
     if (previousLocation.current !== location.pathname) {
@@ -109,11 +128,13 @@ export function Layout() {
             <Settings2 size={18} strokeWidth={1.6} />
             <span>Reading preferences</span>
           </NavLink>
-          <NavLink className="nav-item" to="/admin" onClick={closeNavigation}>
-            <Plus size={18} strokeWidth={1.6} />
-            <span>Manage library</span>
-            <ArrowUpRight size={14} />
-          </NavLink>
+          {(demo || profile?.role === 'admin') && (
+            <NavLink className="nav-item" to="/admin" onClick={closeNavigation}>
+              <Plus size={18} strokeWidth={1.6} />
+              <span>Manage library</span>
+              <ArrowUpRight size={14} />
+            </NavLink>
+          )}
         </nav>
         <div className="sidebar-bottom">
           <div className="quiet-note">
@@ -131,14 +152,30 @@ export function Layout() {
           <Link to="/about" className="profile-row" onClick={closeNavigation}>
             <span className="avatar">F</span>
             <span>
-              <strong>Your reading room</strong>
-              <small>Local demo · this browser</small>
+              <strong>{profile?.display_name || 'Your reading room'}</strong>
+              <small>{demo ? 'Local demo · this browser' : 'Private reading room'}</small>
             </span>
             <ArrowUpRight size={15} />
           </Link>
+          {!demo && (
+            <Button
+              className="sign-out"
+              variant="ghost"
+              disabled={signingOut}
+              onClick={() => void signOut()}
+            >
+              {signingOut ? 'Saving and signing out…' : 'Sign out'}
+            </Button>
+          )}
         </div>
       </aside>
       <div className="main-column">
+        {syncError && (
+          <div className="sync-notice" role="alert">
+            <p>{syncError}</p>
+            <Button onClick={retry}>Reload library</Button>
+          </div>
+        )}
         {storageError && (
           <p className="notice" role="status">
             Browser storage is unavailable. Changes will last for this visit only.

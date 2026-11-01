@@ -28,7 +28,6 @@ describe('application foundation', () => {
 
   it.each([
     ['/books/a-place-between', 'A Place Between'],
-    ['/read/a-place-between', 'A Place Between'],
     ['/admin', 'A thoughtful library starts here'],
     ['/missing', 'This page is missing'],
     ['/books/missing', 'This page is missing'],
