@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
 import {
   BookOpen,
@@ -29,6 +29,13 @@ export function Layout() {
   const location = useLocation();
   const { books, personal, storageError } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const previousLocation = useRef(location.key);
+  useEffect(() => {
+    if (previousLocation.current !== location.key) {
+      document.getElementById('main-content')?.focus();
+      previousLocation.current = location.key;
+    }
+  }, [location.key]);
   const currentShelf = new URLSearchParams(location.search).get('shelf') ?? 'all';
   const countFor = (shelf: string) =>
     books.filter((book) => {
@@ -39,7 +46,15 @@ export function Layout() {
     }).length;
 
   return (
-    <div className="app-layout">
+    <div
+      className="app-layout"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && mobileOpen) {
+          setMobileOpen(false);
+          document.getElementById('navigation-toggle')?.focus();
+        }
+      }}
+    >
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
@@ -49,6 +64,7 @@ export function Layout() {
           folio<span>.</span>
         </Link>
         <Button
+          id="navigation-toggle"
           size="icon"
           variant="ghost"
           aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}

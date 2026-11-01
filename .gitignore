@@ -8,3 +8,7 @@ test-results/
 *.tsbuildinfo
 .DS_Store
 coverage/
+
+# Private project planning documents (keep local only).
+/README.md
+/ROADMAP.md
