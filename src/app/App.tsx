@@ -3,7 +3,8 @@ import { AppProvider } from './Provider';
 import { useApp } from './state';
 import { Layout } from '../components/Layout';
 import { EmptyState } from '../components/EmptyState';
-import { ThemePicker } from '../features/settings/ThemePicker';
+import { Settings } from '../features/settings/Settings';
+import { LoadingState, ErrorState } from '../components/Feedback';
 
 function LibraryPlaceholder() {
   return (
@@ -17,8 +18,8 @@ function LibraryPlaceholder() {
         <p className="eyebrow">THE FIRST CHAPTER</p>
         <h2 id="welcome-title">Good things begin with a little space.</h2>
         <p>
-          Folio’s foundation is here. The bookshelf, book details, and reading engines are coming in
-          the next milestones.
+          A quiet place for the stories you’ll return to. Start by choosing the atmosphere that
+          feels like home.
         </p>
         <Link className="button button-primary" to="/settings">
           Find your reading atmosphere
@@ -35,16 +36,8 @@ function BookPlaceholder({ reader = false }: { reader?: boolean }) {
   const { id } = useParams();
   const { books, loading, error, retry } = useApp();
   const book = books.find((entry) => entry.id === id);
-  if (loading) return <p role="status">Loading book…</p>;
-  if (error)
-    return (
-      <EmptyState title="Could not load this book">
-        <p role="alert">{error}</p>
-        <button className="button" onClick={retry}>
-          Try again
-        </button>
-      </EmptyState>
-    );
+  if (loading) return <LoadingState label="Loading book…" />;
+  if (error) return <ErrorState title="Could not load this book" message={error} onRetry={retry} />;
   if (!book) return <NotFound />;
   return (
     <>
@@ -61,8 +54,8 @@ function BookPlaceholder({ reader = false }: { reader?: boolean }) {
       <EmptyState title={reader ? 'Your reading room is on its way' : 'A place for every book'}>
         <p>
           {reader
-            ? 'PDF and EPUB rendering will arrive in M06 and M07. This fictional book has no attached file.'
-            : 'The full book detail experience arrives in M03.'}
+            ? 'Book reading is coming soon. This fictional book has no attached file.'
+            : 'Book details are coming soon. This is fictional preview metadata.'}
         </p>
         {!reader && (
           <Link className="button" to={`/read/${book.id}`}>
@@ -74,38 +67,12 @@ function BookPlaceholder({ reader = false }: { reader?: boolean }) {
   );
 }
 
-function Settings() {
-  const { preferences, updatePreferences } = useApp();
-  return (
-    <>
-      <header className="page-header">
-        <p className="eyebrow">MAKE YOURSELF AT HOME</p>
-        <h1>Reading preferences</h1>
-        <p className="muted">A comfortable corner, in a color that feels like you.</p>
-      </header>
-      <section className="settings-panel" aria-labelledby="atmosphere-title">
-        <h2 id="atmosphere-title">Your atmosphere</h2>
-        <p className="muted">Saved in this browser. Account sync comes in a later milestone.</p>
-        <ThemePicker />
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={preferences.reducedMotion}
-            onChange={(event) => updatePreferences({ reducedMotion: event.target.checked })}
-          />
-          Reduce interface motion
-        </label>
-      </section>
-    </>
-  );
-}
-
 function AdminPlaceholder() {
   return (
     <EmptyState title="A thoughtful library starts here">
       <p>
-        Admin sign-in and importing are planned for M04–M05. This preview does not accept uploads or
-        grant admin access.
+        Admin sign-in and importing are coming soon. This preview does not accept uploads or grant
+        admin access.
       </p>
       <Link className="button" to="/">
         Return to library
