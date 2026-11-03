@@ -12,7 +12,7 @@ test-results-cloud/
 coverage/
 
 # Private project planning documents (keep local only).
-/README.md
+/README.private.md
 /ROADMAP.md
 /supabase/.temp/
 /public/pdfjs/
